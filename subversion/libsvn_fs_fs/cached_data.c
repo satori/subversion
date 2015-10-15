@@ -1681,6 +1681,20 @@ static svn_error_t *
 rep_read_contents_close(void *baton)
 {
   struct rep_read_baton *rb = baton;
+  rep_state_t *rs;
+  int i;
+
+  if (rb->rs_list)
+    {
+      for (i = 0; i < rb->rs_list->nelts; ++i)
+        {
+          rs = APR_ARRAY_IDX(rb->rs_list, i, rep_state_t *);
+          if (rs->sfile->rfile)
+            {
+              SVN_ERR(svn_fs_fs__close_revision_file(rs->sfile->rfile));
+            }
+        }
+    }
 
   svn_pool_destroy(rb->pool);
   svn_pool_destroy(rb->filehandle_pool);
